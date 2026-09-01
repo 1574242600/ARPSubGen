@@ -1,5 +1,5 @@
 {
-  "name": "orbital-orbit",
+  "name": "generator",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -9,12 +9,22 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "astro": "astro"
   },
   "dependencies": {
     "astro": "^7.2.10"
   },
   "allowScripts": {
-    "esbuild": true
+    "esbuild": true,
+    "lefthook": true
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "eslint-plugin-astro": "^3.1.0",
+    "lefthook": "^2.1.12",
+    "typescript-eslint": "^8.69.0"
   }
 }

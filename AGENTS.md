@@ -1,3 +1,8 @@
+## Code Style
+- Use single quotes by default
+- Soft tabs: 4 spaces
+- Do not use semicolon
+
 ## Development
 
 When starting the dev server, use background mode:
