@@ -1,43 +1,40 @@
-# Astro Starter Kit: Minimal
+# ARPSubGen
+[SonarrPatch-AniRssPatch](https://github.com/1574242600/SonarrPatcher/blob/main/SonarrPatcher.Patches/AniRss/README.md) 订阅配置文件生成器，用于编辑并生成 AniRssPatch 订阅配置文件。   
 
-```sh
-bun create astro@latest -- --template minimal
-```
+[SonarrPatch](https://github.com/1574242600/SonarrPatcher/) 利用了 DOTNET_STARTUP_HOOKS 环境变量，将基于 Harmony 的补丁加载到 Sonarr 中以修改其原有的功能。AniRssPatch 则在该基础上通过新增 Sonarr Task，实现 [ani-rss](https://github.com/wushuo894/ani-rss) 的主要功能。
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 特点
 
-## 🚀 Project Structure
+- 集成 Mikan Project (蜜柑计划)： 可以直接选取 Mikan RSS
+-
 
-Inside of your Astro project, you'll see the following folders and files:
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## 快速开始
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+在 Sonarr 管理页面的开发者工具控制台执行以下代码
+~~~js
+(() => {
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+async function urlSafeBtoaWithGzip(str) {
+  const data = new Uint8Array(await new Response(
+    new Blob([new TextEncoder().encode(str)])
+      .stream().pipeThrough(new CompressionStream("gzip"))
+  ).arrayBuffer());
 
-Any static assets, like images, can be placed in the `public/` directory.
+  return btoa(String.fromCharCode(...data))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
-## 🧞 Commands
+fetch("/api/v3/series", {
+    "headers": {
+        "X-Api-Key": window.Sonarr.apiKey
+    }
+})
+.then(r => r.json())
+.then(items => items.filter(item => item.seriesType === 'anime' &&  item.monitored === true && Date.parse(item.lastAired)  > Date.now() - 30 * 24 * 60 * 60 * 1000))
+.then(items => items.map(item => { return { tvdbId: item.tvdbId, season: item.statistics.seasonCount, title: item.title } }))
+.then(items => JSON.stringify(items))
+.then(async json => window.location.href = `https://arp-subgen.nworm.icu/?config=${await urlSafeBtoaWithGzip(json)}`)
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+})()
+~~~

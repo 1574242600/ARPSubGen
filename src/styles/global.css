@@ -1,0 +1,98 @@
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+@import 'tailwindcss';
+
+/* Auto source detection misses the React island components — scan explicitly. */
+@source '../components';
+@source '../pages';
+
+/*
+ * Iconify for Tailwind 4: turns `icon-[mdi--arrow-up]`-style classes into
+ * monochrome mask icons. Icon data is resolved from the locally installed
+ * @iconify-json/mdi package at build time; only used icons end up in CSS.
+ */
+@plugin "@iconify/tailwind4";
+
+/*
+ * Material You (MD3) design tokens.
+ * Seed color: #6750A4 (Purple/Violet), light scheme.
+ * Naming: --color-md-* maps to Tailwind utilities like bg-md-primary,
+ * text-md-on-surface, border-md-outline, etc.
+ */
+@theme {
+    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+
+    /* Tonal surfaces */
+    --color-md-background: #FFFBFE;
+    --color-md-on-background: #1C1B1F;
+    --color-md-surface: #FFFBFE;
+    --color-md-on-surface: #1C1B1F;
+    --color-md-surface-container: #F3EDF7;
+    --color-md-surface-container-low: #E7E0EC;
+    --color-md-on-surface-variant: #49454F;
+
+    /* Primary */
+    --color-md-primary: #6750A4;
+    --color-md-on-primary: #FFFFFF;
+
+    /* Secondary */
+    --color-md-secondary-container: #E8DEF8;
+    --color-md-on-secondary-container: #1D192B;
+
+    /* Tertiary */
+    --color-md-tertiary: #7D5260;
+    --color-md-on-tertiary: #FFFFFF;
+
+    /* Error */
+    --color-md-error: #B3261E;
+    --color-md-on-error: #FFFFFF;
+
+    /* Outline */
+    --color-md-outline: #79747E;
+
+    /* MD3 signature easing: "Emphasized Decelerate" */
+    --ease-md: cubic-bezier(0.2, 0, 0, 1);
+
+    /* Toast entrance: slide in from the top edge */
+    --animate-toast-in: toast-in 0.3s cubic-bezier(0.2, 0, 0, 1);
+
+    @keyframes toast-in {
+        from {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+}
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+        background-color: var(--color-md-background);
+        color: var(--color-md-on-background);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+        min-height: 100vh;
+    }
+
+    ::selection {
+        background-color: color-mix(in srgb, var(--color-md-primary) 25%, transparent);
+    }
+
+    /* Respect vestibular disorders: keep colors, drop movement */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
