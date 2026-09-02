@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { decodeConfigParam, parseImportedJson, type ParseResult } from '../lib/config'
-import type { Subscription } from '../lib/types'
+import { decodeConfigParam, DEFAULT_EP_OFFSET, DEFAULT_EP_REGEX, parseImportedJson, type ParseResult } from '../lib/config'
+import type { SonarrSeries, Subscription } from '../lib/types'
 import type { ToastItem } from '../components/Toasts'
 
 type PushToast = (tone: ToastItem['tone'], text: string) => void
@@ -15,6 +15,8 @@ export function useSubscriptions(pushToast: PushToast): {
     configImported: boolean
     importJson: (json: string) => void
     updateSub: (tvdbId: number, patch: Partial<Subscription>) => void
+    removeSub: (tvdbId: number) => void
+    addSub: (input: SonarrSeries) => void
 } {
     const [subs, setSubs] = useState<Subscription[]>([])
     const [configImported, setConfigImported] = useState(false)
@@ -52,5 +54,20 @@ export function useSubscriptions(pushToast: PushToast): {
         setSubs(prev => prev.map(sub => sub.tvdbId === tvdbId ? { ...sub, ...patch } : sub))
     }, [])
 
-    return { subs, configImported, importJson, updateSub }
+    const removeSub = useCallback((tvdbId: number) => {
+        setSubs(prev => prev.filter(sub => sub.tvdbId !== tvdbId))
+    }, [])
+
+    /** Manual entry of a bare series; feeds start empty and defaults apply. */
+    const addSub = useCallback((input: SonarrSeries) => {
+        const sub: Subscription = {
+            ...input,
+            rss: [],
+            epRegex: DEFAULT_EP_REGEX,
+            epOffset: DEFAULT_EP_OFFSET,
+        }
+        setSubs(prev => [...prev, sub])
+    }, [])
+
+    return { subs, configImported, importJson, updateSub, removeSub, addSub }
 }

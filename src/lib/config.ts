@@ -1,3 +1,5 @@
+import { isValidEpisodeRegex } from './episode'
+import { mikanIdsOf } from './mikan'
 import type { Subscription, SubscribeEntry } from './types'
 
 export const DEFAULT_EP_REGEX = ' ([0-9]{2,}) '
@@ -89,4 +91,18 @@ export function buildSubscribeFile(subs: Subscription[]): SubscribeEntry[] {
             if (sub.epOffset !== DEFAULT_EP_OFFSET) entry.epOffset = sub.epOffset
             return entry
         })
+}
+
+/**
+ * Problems that must be fixed before a subscription can be saved or exported:
+ * feeds spanning several Mikan shows, or an epRegex that does not compile.
+ * Catalogue-free — conflict detection only inspects the feed urls, so it works
+ * even while the Mikan directory is unavailable.
+ */
+export function subscriptionIssues(sub: Subscription): string[] {
+    const ids = mikanIdsOf(sub.rss)
+    const issues: string[] = []
+    if (ids.length > 1) issues.push(`蜜柑 Id 冲突：${ids.join('、')}`)
+    if (!isValidEpisodeRegex(sub.epRegex)) issues.push('集数正则无效')
+    return issues
 }

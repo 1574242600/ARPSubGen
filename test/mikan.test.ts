@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { mikanIdsOf, mikanRssUrl, parseMikanRss, resolveReleaseGroup } from '../src/lib/mikan'
+import { mikanIdsOf, mikanRssUrl, parseMikanRss, resolveBangumi, resolveReleaseGroup } from '../src/lib/mikan'
 import type { MikanData } from '../src/lib/types'
 
 const mikan: MikanData = {
@@ -57,5 +57,24 @@ describe('resolveReleaseGroup', () => {
         expect(resolveReleaseGroup(mikanRssUrl(3060, 999), mikan)).toBeNull()
         expect(resolveReleaseGroup('https://mikanani.me/RSS/Bangumi?bangumiId=3060', mikan)).toBeNull()
         expect(resolveReleaseGroup('https://example.com/rss', mikan)).toBeNull()
+    })
+})
+
+describe('resolveBangumi', () => {
+    test('唯一且存在于目录的 id 解析出对应番剧', () => {
+        expect(resolveBangumi([mikanRssUrl(3060, 583)], mikan))
+            .toEqual({ ids: [3060], bangumi: mikan.items[0] })
+    })
+
+    test('多个蜜柑 id 视为冲突，不解析番剧', () => {
+        const rss = [mikanRssUrl(3060, 583), mikanRssUrl(42, 7)]
+        expect(resolveBangumi(rss, mikan)).toEqual({ ids: [3060, 42], bangumi: null })
+    })
+
+    test('无蜜柑源或 id 不在目录时 bangumi 为 null', () => {
+        expect(resolveBangumi(['https://example.com/rss'], mikan))
+            .toEqual({ ids: [], bangumi: null })
+        expect(resolveBangumi([mikanRssUrl(42, 7)], mikan))
+            .toEqual({ ids: [42], bangumi: null })
     })
 })

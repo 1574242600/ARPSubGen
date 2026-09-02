@@ -1,4 +1,4 @@
-import type { MikanData } from './types'
+import type { MikanData, MikanSeries } from './types'
 
 export const MIKAN_BASE = 'https://mikanani.me'
 
@@ -51,6 +51,30 @@ export function mikanIdsOf(rss: string[]): number[] {
         if (ref) ids.add(ref.bangumiId)
     }
     return [...ids]
+}
+
+export interface BangumiResolution {
+    /** Distinct Mikan bangumi ids of the feed list, in first-seen order. */
+    ids: number[]
+    /**
+     * Matched catalogue series. Only resolved when the list references exactly
+     * one id that exists in the catalogue; null otherwise (no feeds, several
+     * ids, or an id the catalogue no longer carries).
+     */
+    bangumi: MikanSeries | null
+}
+
+/**
+ * Resolves the feeds of a subscription against the catalogue in one pass,
+ * shared by the editor card and the list rows.
+ */
+export function resolveBangumi(rss: string[], mikan: MikanData): BangumiResolution {
+    const ids = mikanIdsOf(rss)
+    if (ids.length !== 1) return { ids, bangumi: null }
+    return {
+        ids,
+        bangumi: mikan.items.find(item => item.id === ids[0]) ?? null,
+    }
 }
 
 /**

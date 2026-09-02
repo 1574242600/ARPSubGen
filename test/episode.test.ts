@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { episodePreviewGroups, parseEpisode } from '../src/lib/episode'
+import { episodePreviewGroups, isValidEpisodeRegex, parseEpisode } from '../src/lib/episode'
 import type { MikanData } from '../src/lib/types'
 import { mikanRssUrl } from '../src/lib/mikan'
 
@@ -29,6 +29,18 @@ describe('parseEpisode', () => {
     test('无匹配或正则非法返回 null', () => {
         expect(parseEpisode('无职转生 S01', ' ([0-9]{2,}) ', 0)).toBeNull()
         expect(parseEpisode('无职转生', '([', 0)).toBeNull()
+    })
+})
+
+describe('isValidEpisodeRegex', () => {
+    test('可编译的正则返回 true', () => {
+        expect(isValidEpisodeRegex(' ([0-9]{2,}) ')).toBe(true)
+        expect(isValidEpisodeRegex('第(\\d+)集')).toBe(true)
+    })
+
+    test('非法正则返回 false', () => {
+        expect(isValidEpisodeRegex('([')).toBe(false)
+        expect(isValidEpisodeRegex('\\')).toBe(false)
     })
 })
 

@@ -17,6 +17,9 @@ export const btnTonal = `${btnBase} h-10 px-6 text-md-on-secondary-container bg-
 
 export const btnGhost = `${btnBase} h-10 px-4 text-md-primary hover:bg-md-primary/10 active:bg-md-primary/5`
 
+/** Destructive filled action (deletes, clears…), MD3 error-container look. */
+export const btnError = `${btnBase} h-10 px-6 text-md-on-error bg-md-error shadow-sm hover:bg-md-error/90 hover:shadow-md active:bg-md-error/80`
+
 /*
  * Icon-only buttons (MD3 icon-button spec: 40px). Sizes are separate exports
  * rather than appended classes: two `h-*` / `w-*` utilities on one element

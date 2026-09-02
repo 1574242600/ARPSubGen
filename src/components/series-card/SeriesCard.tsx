@@ -1,7 +1,8 @@
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useMemo, type ReactNode } from 'react'
 import type { MikanData, Subscription } from '../../lib/types'
 import { UNTITLED } from '../../lib/config'
-import { mikanIdsOf, parseMikanRss, resolveReleaseGroup } from '../../lib/mikan'
+import { isValidEpisodeRegex } from '../../lib/episode'
+import { parseMikanRss, resolveBangumi, resolveReleaseGroup } from '../../lib/mikan'
 import { btnTonal, cardSurface, inputFilled } from '../../lib/ui'
 import RssRow from './RssRow'
 import MikanAdder from './MikanAdder'
@@ -11,25 +12,22 @@ interface SeriesCardProps {
     sub: Subscription
     mikan: MikanData
     onUpdate: (tvdbId: number, patch: Partial<Subscription>) => void
+    /** Optional action row pinned at the card bottom (e.g. the dialog's save bar). */
+    footer?: ReactNode
 }
 
-function SeriesCardInner({ sub, mikan, onUpdate }: SeriesCardProps) {
+function SeriesCardInner({ sub, mikan, onUpdate, footer }: SeriesCardProps) {
     /** Binds the card's tvdbId once; keeps the memoised card out of re-renders. */
     const patch = useCallback((p: Partial<Subscription>) => onUpdate(sub.tvdbId, p), [onUpdate, sub.tvdbId])
 
-    const regexInvalid = useMemo(() => {
-        try {
-            new RegExp(sub.epRegex)
-            return false
-        } catch {
-            return true
-        }
-    }, [sub.epRegex])
+    const regexInvalid = useMemo(() => !isValidEpisodeRegex(sub.epRegex), [sub.epRegex])
 
-    const mikanIds = useMemo(() => mikanIdsOf(sub.rss), [sub.rss])
+    const { ids: mikanIds, bangumi } = useMemo(
+        () => resolveBangumi(sub.rss, mikan),
+        [sub.rss, mikan],
+    )
     const conflicted = mikanIds.length > 1
     const mikanId = conflicted ? null : (mikanIds[0] ?? null)
-    const bangumi = mikanId === null ? null : mikan.items.find(item => item.id === mikanId) ?? null
 
     /** Swap a feed with the one above it (raising its priority). */
     const raiseUrl = (index: number) => {
@@ -147,6 +145,12 @@ function SeriesCardInner({ sub, mikan, onUpdate }: SeriesCardProps) {
 
                 <EpisodePreview sub={sub} mikan={mikan} />
             </section>
+
+            {footer !== undefined && (
+                <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-md-outline/10 pt-5">
+                    {footer}
+                </div>
+            )}
         </article>
     )
 }

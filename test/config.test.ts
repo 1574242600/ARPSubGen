@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { parseImportedJson, buildSubscribeFile, DEFAULT_EP_REGEX } from '../src/lib/config'
+import { parseImportedJson, buildSubscribeFile, subscriptionIssues, DEFAULT_EP_REGEX } from '../src/lib/config'
 
 describe('parseImportedJson', () => {
     test('rss 列表按原顺序还原，非蜜柑源同样保留', () => {
@@ -102,5 +102,38 @@ describe('buildSubscribeFile', () => {
         expect(result.subscriptions[0].rss).toEqual(subs[0].rss)
         expect(result.subscriptions[1].rss).toEqual(['https://example.com/b'])
         expect(result.subscriptions[1].epOffset).toBe(5)
+    })
+})
+
+describe('subscriptionIssues', () => {
+    const base = { tvdbId: 100, season: 1, title: '', epRegex: DEFAULT_EP_REGEX, epOffset: 0 }
+
+    test('无冲突且正则合法时无问题', () => {
+        expect(subscriptionIssues({ ...base, rss: [] })).toEqual([])
+        expect(subscriptionIssues({ ...base, rss: ['https://example.com/rss'] })).toEqual([])
+        expect(subscriptionIssues({ ...base, rss: [
+            'https://mikanani.me/RSS/Bangumi?bangumiId=3060&subgroupid=583',
+            'https://example.com/rss',
+        ] })).toEqual([])
+    })
+
+    test('同一番剧多个蜜柑源不算冲突，跨番剧才算', () => {
+        expect(subscriptionIssues({ ...base, rss: [
+            'https://mikanani.me/RSS/Bangumi?bangumiId=3060&subgroupid=583',
+            'https://mikanani.me/RSS/Bangumi?bangumiId=3060&subgroupid=1231',
+        ] })).toEqual([])
+
+        expect(subscriptionIssues({ ...base, rss: [
+            'https://mikanani.me/RSS/Bangumi?bangumiId=3060&subgroupid=583',
+            'https://mikanani.me/RSS/Bangumi?bangumiId=42&subgroupid=583',
+        ] })).toEqual(['蜜柑 Id 冲突：3060、42'])
+    })
+
+    test('非法正则报错，且与冲突可同时存在', () => {
+        expect(subscriptionIssues({ ...base, rss: [], epRegex: '([' })).toEqual(['集数正则无效'])
+        expect(subscriptionIssues({ ...base, rss: [
+            'https://mikanani.me/RSS/Bangumi?bangumiId=3060&subgroupid=583',
+            'https://mikanani.me/RSS/Bangumi?bangumiId=42&subgroupid=583',
+        ], epRegex: '([' })).toEqual(['蜜柑 Id 冲突：3060、42', '集数正则无效'])
     })
 })

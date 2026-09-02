@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
-import Hero from './Hero'
 import Guide from './Guide'
-import SeriesCard from './series-card/SeriesCard'
+import SeriesList from './series-list/SeriesList'
 import ExportBar from './ExportBar'
 import Toasts from './Toasts'
-import { buildSubscribeFile } from '../lib/config'
+import { buildSubscribeFile, subscriptionIssues } from '../lib/config'
 import { cardSurface } from '../lib/ui'
 import { useToasts } from '../hooks/useToasts'
 import { useSubscriptions } from '../hooks/useSubscriptions'
@@ -13,15 +12,17 @@ import { useMikanCatalogue } from '../hooks/useMikanCatalogue'
 export default function App() {
     const { toasts, pushToast, dismissToast } = useToasts()
     const { mikan, error: mikanError, isLoading } = useMikanCatalogue()
-    const { subs, configImported, importJson, updateSub } = useSubscriptions(pushToast)
+    const { subs, configImported, importJson, updateSub, removeSub, addSub } = useSubscriptions(pushToast)
 
     const entries = useMemo(() => buildSubscribeFile(subs), [subs])
+    const errorCount = useMemo(
+        () => subs.filter(sub => subscriptionIssues(sub).length > 0).length,
+        [subs],
+    )
 
     return (
         <div className="min-h-screen bg-md-background">
             <main className="mx-auto max-w-4xl px-4 pt-8 pb-36 md:px-6 md:pt-12">
-                <Hero imported={subs.length} ready={entries.length} />
-
                 {mikanError && (
                     <div className={`${cardSurface} mb-8`} role="alert">
                         <p className="font-medium text-md-on-surface">{mikanError}</p>
@@ -49,21 +50,18 @@ export default function App() {
                 )}
 
                 {mikan && subs.length > 0 && (
-                    <div className="space-y-6">
-                        {subs.map(sub => (
-                            <SeriesCard
-                                key={sub.tvdbId}
-                                sub={sub}
-                                mikan={mikan}
-                                onUpdate={updateSub}
-                            />
-                        ))}
-                    </div>
+                    <SeriesList
+                        subs={subs}
+                        mikan={mikan}
+                        onUpdate={updateSub}
+                        onRemove={removeSub}
+                        onAdd={addSub}
+                    />
                 )}
             </main>
 
             {configImported && subs.length > 0 && (
-                <ExportBar ready={entries.length} total={subs.length} entries={entries} />
+                <ExportBar ready={entries.length} total={subs.length} errors={errorCount} entries={entries} />
             )}
 
             <Toasts toasts={toasts} onDismiss={dismissToast} />

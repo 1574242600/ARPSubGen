@@ -1,6 +1,16 @@
 import type { MikanData } from './types'
 import { parseMikanRss } from './mikan'
 
+/** True when the pattern compiles; the editor card and the list row both gate on it. */
+export function isValidEpisodeRegex(regex: string): boolean {
+    try {
+        new RegExp(regex)
+        return true
+    } catch {
+        return false
+    }
+}
+
 /**
  * Mirrors AniRssCommandExecutor: first capture group (or whole match),
  * its leading number, plus the configured offset.

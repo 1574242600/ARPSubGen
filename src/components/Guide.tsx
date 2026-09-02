@@ -38,7 +38,7 @@ const STEPS = [
     },
     {
         title: '导出订阅配置',
-        body: '确认每部剧集的集数解析正则与偏移后，导出 anirss.subscribe.json，放到 AniRssPatch 的配置路径即可生效。',
+        body: '确认每部剧集的集数解析与 RSS 无误后，点底部「导出 JSON」复制或下载 anirss.subscribe.json，放到 AniRssPatch 的配置路径即可生效；或在 Sonarr 控制台执行「导出控制台代码」的脚本，将订阅即时下发。',
     },
 ]
 
@@ -121,9 +121,9 @@ export default function Guide({ onImport }: GuideProps) {
 
             <div className={cardSurface}>
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                    <h3 className="text-xl font-medium text-md-on-surface">Sonarr 控制台脚本</h3>
+                    <h3 className="text-xl font-medium text-md-on-surface">控制台代码</h3>
                     <button type="button" className={btnFilled} onClick={copySnippet}>
-                        {copied ? '已复制 ✓' : '复制脚本'}
+                        {copied ? '已复制 ✓' : '复制代码'}
                     </button>
                 </div>
                 <pre className="overflow-x-auto rounded-2xl bg-md-surface-container-low p-5 text-sm leading-relaxed text-md-on-surface-variant shadow-inner"><code>{SONARR_SNIPPET}</code></pre>
