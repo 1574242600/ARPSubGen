@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
+import { useCopyFeedback } from '../hooks/useCopyFeedback'
 import { btnFilled, btnTonal, cardSurface, textareaFilled } from '../lib/ui'
 
 const SONARR_SNIPPET = `(() => {
@@ -46,15 +47,11 @@ interface GuideProps {
 }
 
 export default function Guide({ onImport }: GuideProps) {
-    const [copied, setCopied] = useState(false)
     const [json, setJson] = useState('')
     const fileRef = useRef<HTMLInputElement>(null)
+    const { copied, copy } = useCopyFeedback()
 
-    const copySnippet = async () => {
-        await navigator.clipboard.writeText(SONARR_SNIPPET)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-    }
+    const copySnippet = () => { void copy(SONARR_SNIPPET) }
 
     const importText = () => {
         if (json.trim()) onImport(json)

@@ -26,6 +26,11 @@ const btnIconBase = `${btnBase} rounded-full px-0 text-md-on-surface-variant hov
 
 export const btnIcon = `${btnIconBase} h-10 w-10`
 
+/* Selectable pill chips: idle is outlined, active is filled. */
+export const chipIdle = 'rounded-full border border-md-outline px-3 py-1 text-xs text-md-primary transition-colors duration-200 hover:bg-md-primary/10'
+
+export const chipActive = 'rounded-full bg-md-primary px-3 py-1 text-xs text-md-on-primary'
+
 export type InputTone = 'default' | 'warning' | 'error'
 
 const inputBase = [

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import type { SubscribeEntry } from '../lib/types'
+import { useCopyFeedback } from '../hooks/useCopyFeedback'
 import { btnFilled, btnTonal } from '../lib/ui'
 
 interface ExportBarProps {
@@ -9,15 +10,11 @@ interface ExportBarProps {
 }
 
 export default function ExportBar({ ready, total, entries }: ExportBarProps) {
-    const [copied, setCopied] = useState(false)
+    const { copied, copy } = useCopyFeedback()
 
-    const json = JSON.stringify(entries, null, 4)
+    const json = useMemo(() => JSON.stringify(entries, null, 4), [entries])
 
-    const copy = async () => {
-        await navigator.clipboard.writeText(json)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-    }
+    const copyJson = () => { void copy(json) }
 
     const download = () => {
         const blob = new Blob([json], { type: 'application/json' })
@@ -40,7 +37,7 @@ export default function ExportBar({ ready, total, entries }: ExportBarProps) {
                         type="button"
                         className={btnTonal}
                         disabled={ready === 0}
-                        onClick={copy}
+                        onClick={copyJson}
                     >
                         {copied ? '已复制 ✓' : '复制 JSON'}
                     </button>
