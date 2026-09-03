@@ -18,7 +18,7 @@ const mikan: MikanData = {
 
 describe('parseEpisode', () => {
     test('默认正则在空格包裹的数字上取集数', () => {
-        expect(parseEpisode('[喵萌] 无职转生 04 [1080p]', ' ([0-9]{2,}) ', 0)).toBe(4)
+        expect(parseEpisode('[喵萌] 无职转生 04 [1080p]', ' (\\d{2,}) ', 0)).toBe(4)
     })
 
     test('偏移作用于提取到的数字', () => {
@@ -27,14 +27,14 @@ describe('parseEpisode', () => {
     })
 
     test('无匹配或正则非法返回 null', () => {
-        expect(parseEpisode('无职转生 S01', ' ([0-9]{2,}) ', 0)).toBeNull()
+        expect(parseEpisode('无职转生 S01', ' (\\d{2,}) ', 0)).toBeNull()
         expect(parseEpisode('无职转生', '([', 0)).toBeNull()
     })
 })
 
 describe('isValidEpisodeRegex', () => {
     test('可编译的正则返回 true', () => {
-        expect(isValidEpisodeRegex(' ([0-9]{2,}) ')).toBe(true)
+        expect(isValidEpisodeRegex(' (\\d{2,}) ')).toBe(true)
         expect(isValidEpisodeRegex('第(\\d+)集')).toBe(true)
     })
 

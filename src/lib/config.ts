@@ -2,7 +2,7 @@ import { isValidEpisodeRegex } from './episode'
 import { mikanIdsOf } from './mikan'
 import type { Subscription, SubscribeEntry } from './types'
 
-export const DEFAULT_EP_REGEX = ' ([0-9]{2,}) '
+export const DEFAULT_EP_REGEX = ' (\\d{2,}) '
 export const DEFAULT_EP_OFFSET = 0
 export const UNTITLED = '未提供标题'
 
