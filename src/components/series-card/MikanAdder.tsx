@@ -17,7 +17,8 @@ interface MikanAdderProps {
  * Adds another feed to the card. When the RSS list already resolves to a
  * catalogue entry, the panel shows only that show's release groups; the
  * search / weekday browser is reserved for cards with no recognisable bangumi,
- * where Jaccard-matched titles (>50%) float to the top marked as recommended.
+ * where Jaccard-matched titles (>40%, ignoring 第X季 markers) float to the top
+ * marked as recommended.
  */
 export default function MikanAdder({ mikan, current, title, onAdd }: MikanAdderProps) {
     const [open, setOpen] = useState(false)

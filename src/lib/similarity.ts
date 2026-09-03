@@ -2,12 +2,29 @@ import type { MikanSeries } from './types'
 import { normalizeTitle } from './mikan'
 
 /**
+ * Mikan season markers built from Chinese numerals (第二季 / 第十七季). They
+ * only identify which season a catalogue page belongs to and would otherwise
+ * dilute the similarity against the bare series title, so they are dropped
+ * before comparing.
+ */
+const SEASON_MARKER_RE = /第[零一二三四五六七八九十百]+季/g
+
+/**
+ * Normalises a title for similarity comparison, additionally removing Mikan
+ * season markers so '葬送的芙莉莲 第二季' compares equal to '葬送的芙莉莲'.
+ */
+function normalizeComparableTitle(title: string): string {
+    return normalizeTitle(title).replace(SEASON_MARKER_RE, '')
+}
+
+/**
  * Jaccard similarity over 2-grams of the normalised titles, the usual way to
- * fuzzy-match short CJK titles. Returns 0 when either side normalises empty.
+ * fuzzy-match short CJK titles. Mikan season markers (第X季) are ignored.
+ * Returns 0 when either side normalises empty.
  */
 export function jaccardSimilarity(a: string, b: string): number {
-    const na = normalizeTitle(a)
-    const nb = normalizeTitle(b)
+    const na = normalizeComparableTitle(a)
+    const nb = normalizeComparableTitle(b)
     if (!na || !nb) return 0
 
     const gramsA = charBigrams(na)
@@ -32,10 +49,10 @@ function charBigrams(text: string): Set<string> {
     return grams
 }
 
-export const RECOMMEND_THRESHOLD = 0.5
+export const RECOMMEND_THRESHOLD = 0.4
 
 /**
- * Catalogue entries whose title is more than 50% similar to the given title,
+ * Catalogue entries whose title is more than 40% similar to the given title,
  * best matches first. Empty titles never recommend anything.
  */
 export function recommendBangumi(title: string, catalogue: MikanSeries[]): MikanSeries[] {
