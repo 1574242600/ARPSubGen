@@ -23,3 +23,6 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .workbuddy/
+
+# local task list
+todo.txt
