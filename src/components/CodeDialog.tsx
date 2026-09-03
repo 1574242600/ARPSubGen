@@ -1,4 +1,5 @@
 import { useCopyFeedback } from '../hooks/useCopyFeedback'
+import { useScrollLock } from '../hooks/useScrollLock'
 import { btnFilled, btnGhost, cardSurface } from '../lib/ui'
 
 interface CodeDialogProps {
@@ -20,6 +21,8 @@ interface CodeDialogProps {
 export default function CodeDialog({ title, code, copyLabel, downloadName, onClose }: CodeDialogProps) {
     const { copied, copy } = useCopyFeedback()
 
+    useScrollLock()
+
     const copyCode = () => { void copy(code) }
 
     const download = () => {
@@ -33,7 +36,7 @@ export default function CodeDialog({ title, code, copyLabel, downloadName, onClo
     }
 
     return (
-        <div className="fixed inset-0 z-40 overflow-y-auto bg-md-on-background/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-md-on-background/40 backdrop-blur-sm">
             <div className="flex min-h-full items-center justify-center p-4">
                 <div
                     role="dialog"

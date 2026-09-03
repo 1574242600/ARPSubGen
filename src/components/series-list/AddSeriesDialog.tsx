@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { SonarrSeries } from '../../lib/types'
 import { btnFilled, btnGhost, cardSurface, inputFilled } from '../../lib/ui'
+import { useScrollLock } from '../../hooks/useScrollLock'
 
 interface AddSeriesDialogProps {
     /** tvdbIds already in the list, to reject duplicates. */
@@ -18,6 +19,8 @@ export default function AddSeriesDialog({ existingIds, onAdd, onClose }: AddSeri
     const [title, setTitle] = useState('')
     const [tvdbId, setTvdbId] = useState('')
     const [season, setSeason] = useState('1')
+
+    useScrollLock()
 
     const tvdb = Number(tvdbId)
     const seasonNum = Number(season)
@@ -42,7 +45,7 @@ export default function AddSeriesDialog({ existingIds, onAdd, onClose }: AddSeri
     }
 
     return (
-        <div className="fixed inset-0 z-40 overflow-y-auto bg-md-on-background/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-md-on-background/40 backdrop-blur-sm">
             <div className="flex min-h-full items-center justify-center p-4">
                 <div
                     role="dialog"

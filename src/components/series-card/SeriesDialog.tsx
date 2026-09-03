@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import type { MikanData, Subscription } from '../../lib/types'
 import { subscriptionIssues } from '../../lib/config'
 import { btnFilled, btnGhost } from '../../lib/ui'
+import { useScrollLock } from '../../hooks/useScrollLock'
 import SeriesCard from './SeriesCard'
 
 interface SeriesDialogProps {
@@ -22,6 +23,8 @@ export default function SeriesDialog({ sub, mikan, onSave, onClose }: SeriesDial
     // draft is guaranteed even when the same card is reopened later.
     const [draft, setDraft] = useState(sub)
 
+    useScrollLock()
+
     const patch = useCallback((_tvdbId: number, p: Partial<Subscription>) => {
         setDraft(prev => ({ ...prev, ...p }))
     }, [])
@@ -31,7 +34,7 @@ export default function SeriesDialog({ sub, mikan, onSave, onClose }: SeriesDial
     const saveDisabled = !dirty || issues.length > 0
 
     return (
-        <div className="fixed inset-0 z-40 overflow-y-auto bg-md-on-background/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-md-on-background/40 backdrop-blur-sm">
             <div className="flex min-h-full items-center justify-center p-4">
                 <div
                     role="dialog"

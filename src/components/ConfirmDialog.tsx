@@ -1,4 +1,5 @@
 import { btnError, btnGhost, cardSurface } from '../lib/ui'
+import { useScrollLock } from '../hooks/useScrollLock'
 
 interface ConfirmDialogProps {
     title: string
@@ -20,8 +21,10 @@ export default function ConfirmDialog({
     onConfirm,
     onClose,
 }: ConfirmDialogProps) {
+    useScrollLock()
+
     return (
-        <div className="fixed inset-0 z-40 overflow-y-auto bg-md-on-background/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-md-on-background/40 backdrop-blur-sm">
             <div className="flex min-h-full items-center justify-center p-4">
                 <div
                     role="alertdialog"
