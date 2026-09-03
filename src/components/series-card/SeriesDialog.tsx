@@ -36,7 +36,7 @@ export default function SeriesDialog({ sub, mikan, onSave, onClose }: SeriesDial
                 <div
                     role="dialog"
                     aria-modal="true"
-                    aria-label={`编辑 ${sub.title || '剧集'}`}
+                    aria-label={`编辑 ${sub.title || '节目'}`}
                     className="w-full max-w-3xl animate-toast-in"
                 >
                     <SeriesCard

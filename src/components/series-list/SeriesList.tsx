@@ -65,8 +65,8 @@ export default function SeriesList({ subs, mikan, onUpdate, onRemove, onAdd }: S
     return (
         <section>
             <header className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-xl font-medium text-md-on-surface">已导入剧集</h2>
-                <p className="text-xs text-md-on-surface-variant">点击行末按钮编辑或删除剧集</p>
+                <h2 className="text-xl font-medium text-md-on-surface">已导入节目</h2>
+                <p className="text-xs text-md-on-surface-variant">点击行末按钮编辑或删除节目</p>
             </header>
             <ul className="divide-y divide-md-outline/10 overflow-hidden rounded-3xl bg-md-surface-container shadow-sm">
                 {subs.map(sub => (
@@ -86,7 +86,7 @@ export default function SeriesList({ subs, mikan, onUpdate, onRemove, onAdd }: S
                 onClick={openAdder}
             >
                 <span className="icon-[mdi--plus] text-2xl" aria-hidden="true" />
-                新增剧集
+                新增节目
             </button>
 
             {editing !== null && (
@@ -102,7 +102,7 @@ export default function SeriesList({ subs, mikan, onUpdate, onRemove, onAdd }: S
             {deleting !== null && (
                 <ConfirmDialog
                     title={`删除「${deleting.title || UNTITLED}」？`}
-                    body="该剧集及其 RSS 订阅配置将从列表中移除，如需恢复只能重新导入。"
+                    body="该节目及其 RSS 订阅配置将从列表中移除，如需恢复只能重新导入。"
                     onConfirm={confirmDelete}
                     onClose={cancelDelete}
                 />

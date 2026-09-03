@@ -30,7 +30,7 @@ export function useSubscriptions(pushToast: PushToast): {
         setSubs(result.subscriptions)
         setConfigImported(true)
         if (result.skipped > 0) {
-            pushToast('info', `已导入 ${result.subscriptions.length} 部剧集，跳过 ${result.skipped} 条无效或重复条目`)
+            pushToast('info', `已导入 ${result.subscriptions.length} 部节目，跳过 ${result.skipped} 条无效或重复条目`)
         }
     }, [pushToast])
 

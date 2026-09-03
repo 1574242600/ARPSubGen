@@ -69,7 +69,7 @@ function SeriesRowInner({ sub, mikan, onEdit, onDelete }: SeriesRowProps) {
                         type="button"
                         className={btnIcon}
                         aria-label={`删除 ${label}`}
-                        title="删除此剧集"
+                        title="删除此节目"
                         onClick={() => onDelete(sub.tvdbId)}
                     >
                         <span className="icon-[mdi--delete] text-2xl" aria-hidden="true" />

@@ -47,10 +47,10 @@ export default function AddSeriesDialog({ existingIds, onAdd, onClose }: AddSeri
                 <div
                     role="dialog"
                     aria-modal="true"
-                    aria-label="新增剧集"
+                    aria-label="新增节目"
                     className={`${cardSurface} w-full max-w-md animate-toast-in`}
                 >
-                    <h3 className="mb-5 text-xl font-medium text-md-on-surface">新增剧集</h3>
+                    <h3 className="mb-5 text-xl font-medium text-md-on-surface">新增节目</h3>
 
                     <div>
                         <label htmlFor="add-title" className="mb-1.5 block text-sm font-medium text-md-on-surface">
@@ -60,7 +60,7 @@ export default function AddSeriesDialog({ existingIds, onAdd, onClose }: AddSeri
                             id="add-title"
                             type="text"
                             className={inputFilled()}
-                            placeholder="剧集标题，留空显示 未提供标题"
+                            placeholder="节目标题，留空显示 未提供标题"
                             value={title}
                             onChange={e => setTitle(e.target.value)}
                         />

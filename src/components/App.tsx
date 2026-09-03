@@ -42,9 +42,9 @@ export default function App() {
 
                 {mikan && configImported && subs.length === 0 && (
                     <div className={`${cardSurface}`}>
-                        <h2 className="mb-2 text-2xl font-medium text-md-on-surface">没有可配置的剧集</h2>
+                        <h2 className="mb-2 text-2xl font-medium text-md-on-surface">没有可配置的节目</h2>
                         <p className="text-md-on-surface-variant">
-                            导入的配置中没有剧集，请回到 Sonarr 确认存在已监控的动画剧集后重试。
+                            导入的配置中没有节目，请回到 Sonarr 确认存在已监控的动画节目后重试。
                         </p>
                     </div>
                 )}
