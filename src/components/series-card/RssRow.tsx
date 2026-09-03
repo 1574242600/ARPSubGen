@@ -16,6 +16,12 @@ interface RssRowProps {
 export default function RssRow({ url, index, tone, group, hint, onChange, onMoveUp, onRemove }: RssRowProps) {
     return (
         <li className="flex items-start gap-2">
+            {/* Priority ordinal; centred against the 56px field so a hint below does not move it. */}
+            <span aria-hidden="true" className="flex h-14 w-8 shrink-0 items-center justify-center">
+                <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-md-surface-container-low px-1.5 text-xs font-medium tabular-nums text-md-on-surface-variant">
+                    {index + 1}
+                </span>
+            </span>
             <div className="min-w-0 flex-1">
                 <div className="relative">
                     <input
