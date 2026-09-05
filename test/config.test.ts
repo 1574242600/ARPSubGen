@@ -64,21 +64,25 @@ describe('parseImportedJson', () => {
 })
 
 describe('buildSubscribeFile', () => {
-    test('默认 epRegex/epOffset 不导出，无订阅源的跳过', () => {
+    test('带 title 导出，默认 epRegex/epOffset 不导出，空标题省略，无订阅源的跳过', () => {
         const subs = [
             { tvdbId: 100, season: 1, title: 'A', rss: ['https://example.com/a'], epRegex: DEFAULT_EP_REGEX, epOffset: 0 },
             { tvdbId: 200, season: 2, title: 'B', rss: ['https://example.com/b'], epRegex: ' 第(\\d+)集 ', epOffset: 5 },
             { tvdbId: 300, season: 1, title: 'C', rss: [], epRegex: DEFAULT_EP_REGEX, epOffset: 0 },
+            { tvdbId: 400, season: 1, title: '', rss: ['https://example.com/c'], epRegex: DEFAULT_EP_REGEX, epOffset: 0 },
         ]
 
         const entries = buildSubscribeFile(subs)
 
-        expect(entries).toHaveLength(2)
+        expect(entries).toHaveLength(3)
+        expect(entries[0].title).toBe('A')
         expect(entries[0]).not.toHaveProperty('epRegex')
         expect(entries[0]).not.toHaveProperty('epOffset')
         expect(entries[0].rss).toEqual(['https://example.com/a'])
+        expect(entries[1].title).toBe('B')
         expect(entries[1].epRegex).toBe(' 第(\\d+)集 ')
         expect(entries[1].epOffset).toBe(5)
+        expect(entries[2]).not.toHaveProperty('title')
     })
 
     test('导出 → 再导入完整还原状态（round-trip）', () => {

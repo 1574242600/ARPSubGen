@@ -76,7 +76,8 @@ function toSubscription(raw: unknown): Subscription | null {
 
 /**
  * Build anirss.subscribe.json entries. Default epRegex/epOffset are omitted,
- * matching the patch's fallback behaviour.
+ * matching the patch's fallback behaviour; title is carried along when the
+ * series has one (manual entries may be untitled).
  */
 export function buildSubscribeFile(subs: Subscription[]): SubscribeEntry[] {
     return subs
@@ -87,6 +88,7 @@ export function buildSubscribeFile(subs: Subscription[]): SubscribeEntry[] {
                 season: sub.season,
                 rss: sub.rss,
             }
+            if (sub.title) entry.title = sub.title
             if (sub.epRegex !== DEFAULT_EP_REGEX) entry.epRegex = sub.epRegex
             if (sub.epOffset !== DEFAULT_EP_OFFSET) entry.epOffset = sub.epOffset
             return entry

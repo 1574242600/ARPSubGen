@@ -30,12 +30,14 @@ export interface Subscription extends SonarrSeries {
 
 /**
  * Entry of anirss.subscribe.json. Only tvdbId, season and rss are required;
- * epRegex/epOffset are omitted when they equal the defaults.
+ * title is an optional human-readable label, epRegex/epOffset are omitted
+ * when they equal the defaults.
  */
 export interface SubscribeEntry {
     tvdbId: number
     season: number
     rss: string[]
+    title?: string
     epRegex?: string
     epOffset?: number
 }
