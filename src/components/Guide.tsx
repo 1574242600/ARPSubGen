@@ -1,5 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import { useCopyFeedback } from '../hooks/useCopyFeedback'
+import { formatDraftTime, type Draft } from '../lib/draft'
 import { btnFilled, btnTonal, cardSurface, textareaFilled } from '../lib/ui'
 
 const SONARR_SNIPPET = `(() => {
@@ -44,9 +45,12 @@ const STEPS = [
 
 interface GuideProps {
     onImport: (json: string) => void
+    /** Work saved by the previous visit, if any. */
+    draft: Draft | null
+    onRestore: () => void
 }
 
-export default function Guide({ onImport }: GuideProps) {
+export default function Guide({ onImport, draft, onRestore }: GuideProps) {
     const [json, setJson] = useState('')
     const fileRef = useRef<HTMLInputElement>(null)
     const { copied, copy } = useCopyFeedback()
@@ -117,6 +121,17 @@ export default function Guide({ onImport }: GuideProps) {
                         onChange={importFile}
                     />
                 </div>
+
+                {draft !== null && (
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-md-surface-container-low px-4 py-3">
+                        <p className="text-sm text-md-on-surface-variant">
+                            上次修改：{formatDraftTime(draft.savedAt)} · {draft.subscriptions.length} 部节目
+                        </p>
+                        <button type="button" className={btnTonal} onClick={onRestore}>
+                            回到上次修改
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className={cardSurface}>

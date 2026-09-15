@@ -41,6 +41,16 @@ export function parseImportedJson(text: string): ParseResult {
         throw new Error('不是有效的 JSON')
     }
     if (!Array.isArray(data)) throw new Error('JSON 根节点必须是数组')
+    return parseSeriesList(data)
+}
+
+/**
+ * Same normalisation as {@link parseImportedJson}, for callers that already hold
+ * parsed JSON (the local draft) and cannot fail on a user-supplied string:
+ * anything that is not an array simply reads as an empty list.
+ */
+export function parseSeriesList(data: unknown): ParseResult {
+    if (!Array.isArray(data)) return { subscriptions: [], skipped: 0 }
 
     const subscriptions: Subscription[] = []
     const seen = new Set<number>()

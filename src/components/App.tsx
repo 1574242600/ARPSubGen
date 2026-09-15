@@ -3,7 +3,9 @@ import Guide from './Guide'
 import SeriesList from './series-list/SeriesList'
 import ExportBar from './ExportBar'
 import Toasts from './Toasts'
+import ConfirmDialog from './ConfirmDialog'
 import { buildSubscribeFile, subscriptionIssues } from '../lib/config'
+import { formatDraftTime } from '../lib/draft'
 import { cardSurface } from '../lib/ui'
 import { useToasts } from '../hooks/useToasts'
 import { useSubscriptions } from '../hooks/useSubscriptions'
@@ -12,7 +14,10 @@ import { useMikanCatalogue } from '../hooks/useMikanCatalogue'
 export default function App() {
     const { toasts, pushToast, dismissToast } = useToasts()
     const { mikan, error: mikanError, isLoading } = useMikanCatalogue()
-    const { subs, configImported, importJson, updateSub, removeSub, addSub } = useSubscriptions(pushToast)
+    const {
+        subs, configImported, draft, draftPrompt, importJson,
+        updateSub, removeSub, addSub, restoreDraft, keepImported,
+    } = useSubscriptions(pushToast)
 
     const entries = useMemo(() => buildSubscribeFile(subs), [subs])
     const errorCount = useMemo(
@@ -38,7 +43,9 @@ export default function App() {
                     </div>
                 )}
 
-                {!isLoading && !configImported && <Guide onImport={importJson} />}
+                {!isLoading && !configImported && (
+                    <Guide onImport={importJson} draft={draft} onRestore={restoreDraft} />
+                )}
 
                 {mikan && configImported && subs.length === 0 && (
                     <div className={`${cardSurface}`}>
@@ -65,6 +72,18 @@ export default function App() {
             )}
 
             <Toasts toasts={toasts} onDismiss={dismissToast} />
+
+            {draftPrompt !== null && (
+                <ConfirmDialog
+                    title="回到上次修改？"
+                    body={`本地保存着 ${formatDraftTime(draftPrompt.draft.savedAt)} 的修改（${draftPrompt.draft.subscriptions.length} 部节目），本次跳转又带来 ${draftPrompt.imported.subscriptions.length} 部节目，两者只能保留一个。`}
+                    confirmLabel="回到上次修改"
+                    cancelLabel="使用本次导入"
+                    tone="filled"
+                    onConfirm={restoreDraft}
+                    onClose={keepImported}
+                />
+            )}
         </div>
     )
 }

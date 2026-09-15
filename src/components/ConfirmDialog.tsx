@@ -1,23 +1,40 @@
-import { btnError, btnGhost, cardSurface } from '../lib/ui'
+import { btnError, btnFilled, btnGhost, cardSurface } from '../lib/ui'
 import { useScrollLock } from '../hooks/useScrollLock'
+
+type ConfirmTone = 'error' | 'filled'
+
+const confirmTone: Record<ConfirmTone, string> = {
+    error: btnError,
+    filled: btnFilled,
+}
 
 interface ConfirmDialogProps {
     title: string
     body: string
-    /** Label of the destructive action, default 删除. */
+    /** Label of the confirming action, default 删除. */
     confirmLabel?: string
+    /** Label of the dismissing action, default 取消. */
+    cancelLabel?: string
+    /**
+     * Weight of the confirming action: `error` for destructive ones (MD3
+     * error-container), `filled` when it is a plain choice between two outcomes.
+     */
+    tone?: ConfirmTone
     onConfirm: () => void
     onClose: () => void
 }
 
 /**
- * Minimal explicit-confirmation dialog for destructive row actions. The scrim
- * does not dismiss it — the user picks 取消 or the destructive action.
+ * Minimal explicit-confirmation dialog. The scrim does not dismiss it — the user
+ * picks one of the two actions, so a delete never happens by accident and a
+ * decision that discards work (a draft, an import) is always taken on purpose.
  */
 export default function ConfirmDialog({
     title,
     body,
     confirmLabel = '删除',
+    cancelLabel = '取消',
+    tone = 'error',
     onConfirm,
     onClose,
 }: ConfirmDialogProps) {
@@ -36,9 +53,9 @@ export default function ConfirmDialog({
                     <p className="mt-2 text-sm leading-relaxed text-md-on-surface-variant">{body}</p>
                     <div className="mt-6 flex flex-wrap items-center justify-end gap-2">
                         <button type="button" className={btnGhost} onClick={onClose}>
-                            取消
+                            {cancelLabel}
                         </button>
-                        <button type="button" className={btnError} onClick={onConfirm}>
+                        <button type="button" className={confirmTone[tone]} onClick={onConfirm}>
                             {confirmLabel}
                         </button>
                     </div>
