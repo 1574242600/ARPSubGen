@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { MIKAN_BASE } from '../../lib/mikan'
 import { btnIcon, inputFilled, type InputTone } from '../../lib/ui'
 
@@ -7,13 +8,15 @@ interface RssRowProps {
     tone: InputTone
     group: string | null
     hint: string | null
+    /** Episode config of this feed, rendered under the URL field. */
+    config?: ReactNode
     onChange: (url: string) => void
     onMoveUp: () => void
     onRemove: () => void
 }
 
-/** One feed row: editable URL, a raise-priority control and a delete action. */
-export default function RssRow({ url, index, tone, group, hint, onChange, onMoveUp, onRemove }: RssRowProps) {
+/** One feed row: editable URL, its episode config, and priority/delete actions. */
+export default function RssRow({ url, index, tone, group, hint, config, onChange, onMoveUp, onRemove }: RssRowProps) {
     return (
         <li className="flex items-start gap-2">
             {/* Priority ordinal; centred against the 56px field so a hint below does not move it. */}
@@ -42,6 +45,7 @@ export default function RssRow({ url, index, tone, group, hint, onChange, onMove
                     )}
                 </div>
                 {hint !== null && <p className="mt-1 text-xs text-amber-700">{hint}</p>}
+                {config}
             </div>
 
             {/* Matches the input's h-14 height so the actions centre against the field. */}

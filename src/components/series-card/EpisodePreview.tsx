@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { MikanData, Subscription } from '../../lib/types'
 import { episodePreviewGroups, parseEpisode } from '../../lib/episode'
+import { resolveEpOffset, resolveEpRegex } from '../../lib/feed'
 
 interface EpisodePreviewProps {
     sub: Subscription
@@ -10,23 +11,26 @@ interface EpisodePreviewProps {
 /**
  * Checks the episode parser against the latest titles of the Mikan release
  * groups the RSS list references, grouped per group, so a bad epRegex or a
- * wrongly ordered priority shows up before export.
+ * wrongly ordered priority shows up before export. Each group parses with the
+ * config of the feed it came from, which is labelled per group - two groups
+ * only differ when their feeds were configured differently.
  */
 export default function EpisodePreview({ sub, mikan }: EpisodePreviewProps) {
     const groups = useMemo(() => episodePreviewGroups(sub.rss, mikan), [sub.rss, mikan])
 
-    // Parsed rows only depend on the groups plus the parser inputs; memoising
-    // here keeps typing in the RSS fields from re-running every parseEpisode.
+    // Parsed rows only depend on the groups plus the per-feed config; memoising
+    // here keeps unrelated re-renders from re-running every parseEpisode.
     const parsedGroups = useMemo(
         () => groups.map(group => ({
             key: group.key,
             name: group.name,
+            feedIndex: group.feedIndex,
             rows: group.titles.map(title => ({
                 title,
-                episode: parseEpisode(title, sub.epRegex, sub.epOffset),
+                episode: parseEpisode(title, resolveEpRegex(sub, group.feedIndex), resolveEpOffset(sub, group.feedIndex)),
             })),
         })),
-        [groups, sub.epRegex, sub.epOffset],
+        [groups, sub],
     )
 
     if (parsedGroups.length === 0) {
@@ -43,7 +47,12 @@ export default function EpisodePreview({ sub, mikan }: EpisodePreviewProps) {
             <div className="space-y-4">
                 {parsedGroups.map(group => (
                     <div key={group.key}>
-                        <p className="mb-1.5 text-xs font-medium text-md-on-surface-variant">{group.name}</p>
+                        <p className="mb-1.5 flex items-center gap-2 text-xs font-medium text-md-on-surface-variant">
+                            <span className="truncate">{group.name}</span>
+                            <span className="shrink-0 rounded-full bg-md-surface-container-low px-2 py-0.5 font-normal">
+                                源 {group.feedIndex + 1}
+                            </span>
+                        </p>
                         <ul className="space-y-2">
                             {group.rows.map(row => (
                                 <li key={row.title} className="flex items-center gap-3 text-sm">

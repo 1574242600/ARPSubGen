@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { decodeConfigParam, DEFAULT_EP_OFFSET, DEFAULT_EP_REGEX, parseImportedJson, type ParseResult } from '../lib/config'
+import { decodeConfigParam, parseImportedJson, type ParseResult } from '../lib/config'
+import { DEFAULT_EP_OFFSET, DEFAULT_EP_REGEX } from '../lib/feed'
 import type { SonarrSeries, Subscription } from '../lib/types'
 import type { ToastItem } from '../components/Toasts'
 
@@ -63,8 +64,8 @@ export function useSubscriptions(pushToast: PushToast): {
         const sub: Subscription = {
             ...input,
             rss: [],
-            epRegex: DEFAULT_EP_REGEX,
-            epOffset: DEFAULT_EP_OFFSET,
+            epRegex: [DEFAULT_EP_REGEX],
+            epOffset: [DEFAULT_EP_OFFSET],
         }
         setSubs(prev => [...prev, sub])
     }, [])

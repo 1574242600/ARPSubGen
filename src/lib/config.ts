@@ -1,9 +1,8 @@
 import { isValidEpisodeRegex } from './episode'
+import { parseEpOffsetField, parseEpRegexField, subscribeEpOffset, subscribeEpRegex } from './feed'
 import { mikanIdsOf } from './mikan'
 import type { Subscription, SubscribeEntry } from './types'
 
-export const DEFAULT_EP_REGEX = ' (\\d{2,}) '
-export const DEFAULT_EP_OFFSET = 0
 export const UNTITLED = '未提供标题'
 
 export interface ParseResult {
@@ -29,9 +28,10 @@ export async function decodeConfigParam(param: string): Promise<ParseResult> {
 
 /**
  * Accepts both the Sonarr series list ([{tvdbId, season, title}]) and an
- * existing anirss.subscribe.json ([{tvdbId, season, rss?, epRegex?, epOffset?}]).
- * Every field except tvdbId and season is optional; feed URLs are kept as-is,
- * in their original priority order.
+ * existing anirss.subscribe.json ([{tvdbId, season, rss?, epRegex?, epOffset?}],
+ * where the two optional fields are per-feed arrays whose blank or missing
+ * entries inherit entry 0). Every field except tvdbId and season is optional;
+ * feed URLs are kept as-is, in their original priority order.
  */
 export function parseImportedJson(text: string): ParseResult {
     let data: unknown
@@ -67,17 +67,19 @@ function toSubscription(raw: unknown): Subscription | null {
         season: season as number,
         title: typeof title === 'string' ? title : '',
         rss: Array.isArray(rss) ? rss.filter((url): url is string => typeof url === 'string') : [],
-        epRegex: typeof epRegex === 'string' ? epRegex : DEFAULT_EP_REGEX,
-        epOffset: typeof epOffset === 'number' && Number.isFinite(epOffset)
-            ? epOffset
-            : DEFAULT_EP_OFFSET,
+        // Per-feed entries, entry 0 being the default the others inherit.
+        epRegex: parseEpRegexField(epRegex),
+        epOffset: parseEpOffsetField(epOffset),
     }
 }
 
 /**
- * Build anirss.subscribe.json entries. Default epRegex/epOffset are omitted,
- * matching the patch's fallback behaviour; title is carried along when the
- * series has one (manual entries may be untitled).
+ * Build anirss.subscribe.json entries. Episodes are configured per feed - entry
+ * i belongs to rss[i] and entry 0 defaults the rest - and both fields are
+ * written as plain arrays holding the value in force for every feed; a field
+ * left at the built-in default is omitted, matching the patch's fallback
+ * behaviour. title is carried along when the series has one (manual entries may
+ * be untitled).
  */
 export function buildSubscribeFile(subs: Subscription[]): SubscribeEntry[] {
     return subs
@@ -89,15 +91,21 @@ export function buildSubscribeFile(subs: Subscription[]): SubscribeEntry[] {
                 rss: sub.rss,
             }
             if (sub.title) entry.title = sub.title
-            if (sub.epRegex !== DEFAULT_EP_REGEX) entry.epRegex = sub.epRegex
-            if (sub.epOffset !== DEFAULT_EP_OFFSET) entry.epOffset = sub.epOffset
+
+            const epRegex = subscribeEpRegex(sub)
+            if (epRegex !== null) entry.epRegex = epRegex
+
+            const epOffset = subscribeEpOffset(sub)
+            if (epOffset !== null) entry.epOffset = epOffset
+
             return entry
         })
 }
 
 /**
  * Problems that must be fixed before a subscription can be saved or exported:
- * feeds spanning several Mikan shows, or an epRegex that does not compile.
+ * feeds spanning several Mikan shows, or an episode regex that does not compile
+ * (reported per feed, entry 0 being the default the others inherit).
  * Catalogue-free — conflict detection only inspects the feed urls, so it works
  * even while the Mikan directory is unavailable.
  */
@@ -105,6 +113,11 @@ export function subscriptionIssues(sub: Subscription): string[] {
     const ids = mikanIdsOf(sub.rss)
     const issues: string[] = []
     if (ids.length > 1) issues.push(`蜜柑 Id 冲突：${ids.join('、')}`)
-    if (!isValidEpisodeRegex(sub.epRegex)) issues.push('集数正则无效')
+
+    sub.epRegex.forEach((regex, index) => {
+        if (regex === undefined || isValidEpisodeRegex(regex)) return
+        issues.push(index === 0 ? '集数正则无效' : `第 ${index + 1} 个源的集数正则无效`)
+    })
+
     return issues
 }

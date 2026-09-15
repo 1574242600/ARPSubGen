@@ -55,6 +55,11 @@ export function inputFilled(tone: InputTone = 'default'): string {
     return `${inputBase} ${inputTone[tone]} h-14`
 }
 
+/** Same field, compact: for dense secondary inputs such as the per-feed config rows. */
+export function inputCompact(tone: InputTone = 'default'): string {
+    return `${inputBase} ${inputTone[tone]} h-10 text-sm`
+}
+
 export function textareaFilled(tone: InputTone = 'default'): string {
     return `${inputBase} ${inputTone[tone]} min-h-32 resize-y py-3 font-mono text-sm leading-relaxed`
 }

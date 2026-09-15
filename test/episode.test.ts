@@ -57,16 +57,20 @@ describe('episodePreviewGroups', () => {
                 key: '3060:583',
                 name: '喵萌奶茶屋',
                 titles: ['[喵萌奶茶屋] 无职转生 04 [1080p]', '[喵萌奶茶屋] 无职转生 05 [1080p]'],
+                feedIndex: 0,
             },
-            { key: '3060:1231', name: 'ANi', titles: ['[ANi] 无职转生 05 简体'] },
+            { key: '3060:1231', name: 'ANi', titles: ['[ANi] 无职转生 05 简体'], feedIndex: 2 },
         ])
     })
 
-    test('同一发布组多行 RSS 合并为一组', () => {
-        const rss = [mikanRssUrl(3060, 583), mikanRssUrl(3060, 583)]
+    test('同一发布组多行 RSS 合并为一组，取先出现的源', () => {
+        const rss = ['https://example.com/other', mikanRssUrl(3060, 583), mikanRssUrl(3060, 583)]
 
-        expect(episodePreviewGroups(rss, mikan)).toHaveLength(1)
-        expect(episodePreviewGroups(rss, mikan)[0].titles).toHaveLength(2)
+        const groups = episodePreviewGroups(rss, mikan)
+
+        expect(groups).toHaveLength(1)
+        expect(groups[0].titles).toHaveLength(2)
+        expect(groups[0].feedIndex).toBe(1)
     })
 
     test('目录外的组、无标题的组与非蜜柑 RSS 被跳过', () => {

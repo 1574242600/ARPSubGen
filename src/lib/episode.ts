@@ -33,6 +33,8 @@ export interface EpisodePreviewGroup {
     key: string
     name: string
     titles: string[]
+    /** Position in the RSS list that contributed this group; its config applies. */
+    feedIndex: number
 }
 
 /**
@@ -43,8 +45,8 @@ export interface EpisodePreviewGroup {
  */
 export function episodePreviewGroups(rss: string[], mikan: MikanData): EpisodePreviewGroup[] {
     const groups = new Map<string, EpisodePreviewGroup>()
-    for (const url of rss) {
-        const ref = parseMikanRss(url)
+    for (let feedIndex = 0; feedIndex < rss.length; feedIndex++) {
+        const ref = parseMikanRss(rss[feedIndex])
         if (ref === null || ref.groupId === null) continue
         const bangumi = mikan.items.find(item => item.id === ref.bangumiId)
         const group = bangumi?.releaseGroups.find(g => g.id === ref.groupId)
@@ -56,6 +58,7 @@ export function episodePreviewGroups(rss: string[], mikan: MikanData): EpisodePr
             key,
             name: mikan.releaseGroupNames[String(group.id)] ?? `字幕组 ${group.id}`,
             titles: [...group.items],
+            feedIndex,
         })
     }
     return [...groups.values()]
